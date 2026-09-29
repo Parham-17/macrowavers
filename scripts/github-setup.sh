@@ -7,6 +7,7 @@ cd "$(dirname "$0")/.."
 
 full="${1:?usage: scripts/github-setup.sh <owner>/<repo> [public|private]}"
 visibility="${2:-private}"
+description="Macrowavers for Apple Vision Pro"
 [[ "$visibility" =~ ^(public|private)$ ]] || { echo "visibility must be public or private"; exit 1; }
 gh auth status >/dev/null 2>&1 || { echo "Not logged in. Run: gh auth login"; exit 1; }
 
@@ -17,7 +18,7 @@ if gh repo view "$full" >/dev/null 2>&1; then
   echo "Already exists, reusing."
 else
   gh repo create "$full" "--$visibility" \
-    --description "Macrowavers: a native visionOS game on the theme Sky and the Planets, built in 40 days (Arte-1 challenge)" \
+    --description "$description" \
     --disable-wiki --disable-issues
 fi
 # Use the protocol chosen in `gh auth login` (ssh or https).
@@ -41,6 +42,7 @@ git push -u origin main develop
 step "Repository settings (default branch develop, squash titles from PR, auto-delete branches, Jira is the tracker)"
 gh api -X PATCH "repos/$full" \
   -f default_branch=develop \
+  -f description="$description" \
   -F delete_branch_on_merge=true \
   -F allow_squash_merge=true \
   -F allow_merge_commit=true \
