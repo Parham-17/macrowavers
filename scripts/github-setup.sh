@@ -20,7 +20,14 @@ else
     --description "Macrowavers: a native visionOS game on the theme Sky and the Planets, built in 40 days (Arte-1 challenge)" \
     --disable-wiki --disable-issues
 fi
-git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$full.git"
+# Use the protocol chosen in `gh auth login` (ssh or https).
+if [ "$(gh config get git_protocol -h github.com 2>/dev/null)" = ssh ]; then
+  url="git@github.com:$full.git"
+else
+  url="https://github.com/$full.git"
+fi
+git remote get-url origin >/dev/null 2>&1 || git remote add origin "$url"
+echo "origin: $(git remote get-url origin)"
 
 step "Push main and develop"
 git push -u origin main develop
