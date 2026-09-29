@@ -29,6 +29,12 @@ fi
 git remote get-url origin >/dev/null 2>&1 || git remote add origin "$url"
 echo "origin: $(git remote get-url origin)"
 
+step "CI: macOS builds go to the self-hosted runner"
+# Hosted macOS images have no Xcode 27 yet (docs/ci.md). Without this, the first push shows a failed build.
+# Remove later with: gh variable delete CI_MACOS_RUNNER --repo <owner>/<repo>
+gh variable set CI_MACOS_RUNNER --repo "$full" --body self-hosted
+echo "ok"
+
 step "Push main and develop"
 git push -u origin main develop
 
@@ -67,7 +73,7 @@ fi
 step "Next steps"
 cat <<NEXT
 1. Invite the team:   gh api -X PUT repos/$full/collaborators/<github-user> -f permission=push   (repeat per person)
-2. CI runner:         docs/ci.md  (hosted macOS runners have no Xcode 27 yet; set up the self-hosted runner)
+2. CI runner:         docs/ci.md  (builds wait for a self-hosted runner; register one Mac, about 10 minutes)
 3. Jira link:         Jira -> Apps -> GitHub for Jira -> connect this repository, so AR126-nn keys link branches and PRs.
 4. Open it:           gh repo view $full --web
 NEXT

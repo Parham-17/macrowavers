@@ -35,10 +35,8 @@ must be installed. `xcodegen` and `git-lfs` should be installed too (`brew insta
    ```
 3. Keep the Mac awake: System Settings → Energy → prevent sleeping when the display is off, or run
    `caffeinate -s` in a terminal during work hours.
-4. Point CI at it:
-   ```bash
-   gh variable set CI_MACOS_RUNNER --body self-hosted
-   ```
+4. CI already points at it: `scripts/github-setup.sh` sets the repository variable `CI_MACOS_RUNNER=self-hosted`.
+   Until a runner is registered, the **Build and test** job waits in the queue, and PRs cannot merge.
 5. Open a test PR and watch **Build and test** run on the machine.
 
 To go back to hosted runners once they have Xcode 27: `gh variable delete CI_MACOS_RUNNER`.
