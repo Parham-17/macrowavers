@@ -1,5 +1,5 @@
 import Testing
-@testable import SkyAndPlanets
+@testable import Macrowavers
 
 @MainActor
 struct AppModelTests {

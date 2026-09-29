@@ -5,7 +5,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Text("Sky and the Planets")
+            Text("Macrowavers")
                 .font(.extraLargeTitle)
             Text(statusText)
                 .font(.title2)

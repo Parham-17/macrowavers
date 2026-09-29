@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct SkyAndPlanetsApp: App {
+struct MacrowaversApp: App {
     @State private var appModel = AppModel()
 
     var body: some Scene {

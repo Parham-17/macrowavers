@@ -1,7 +1,7 @@
 # Team entry points. Run `make` to list them.
 SHELL := /bin/bash
-PROJECT := SkyAndPlanets
-SCHEME  := SkyAndPlanets
+PROJECT := Macrowavers
+SCHEME  := Macrowavers
 DEST    := platform=visionOS Simulator,name=Apple Vision Pro,OS=latest
 
 .DEFAULT_GOAL := help

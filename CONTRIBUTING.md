@@ -114,7 +114,7 @@ Every binary format in `.gitattributes` is stored in Git LFS. The `pre-commit` h
 are not. Clone size stays small and history stays fast.
 
 - Keep single files under 25 MB. Textures at 2K by default. Ask before adding a 4K texture or a long audio file.
-- Sources go in `Assets/` (Blender, PSD, WAV). Exports the app loads go in `Sources/SkyAndPlanets/Resources/`.
+- Sources go in `Assets/` (Blender, PSD, WAV). Exports the app loads go in `Sources/Macrowavers/Resources/`.
 - **RCP 3 projects cannot be merged.** The bundle holds an opaque store. The rule is one owner per scene at a
   time: write "editing SolarSystem scene" on the Jira ticket or in chat before you open it, commit and push in
   your own PR when done, then release it. If two people need the same scene, split it into two scenes.

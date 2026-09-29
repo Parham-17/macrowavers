@@ -1,6 +1,6 @@
 # XcodeGen spec. The .xcodeproj is generated from this file and is NOT committed.
 # Edit this file, run `make generate`, commit the change. See docs/decisions/0002-xcodegen.md.
-name: SkyAndPlanets
+name: Macrowavers
 
 options:
   bundleIdPrefix: com.arte1
@@ -41,19 +41,19 @@ settings:
       ONLY_ACTIVE_ARCH: YES
 
 targets:
-  SkyAndPlanets:
+  Macrowavers:
     type: application
     platform: visionOS
     sources:
-      - path: Sources/SkyAndPlanets
+      - path: Sources/Macrowavers
         excludes:
           - "Resources/**"
-      - path: Sources/SkyAndPlanets/Resources
+      - path: Sources/Macrowavers/Resources
         buildPhase: resources
     info:
-      path: Sources/SkyAndPlanets/Info.plist
+      path: Sources/Macrowavers/Info.plist
       properties:
-        CFBundleDisplayName: Sky and the Planets
+        CFBundleDisplayName: Macrowavers
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UIApplicationSceneManifest:
@@ -65,22 +65,22 @@ targets:
         # NSWorldSensingUsageDescription: World sensing places the sun on your table.
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.arte1.skyandplanets
+        PRODUCT_BUNDLE_IDENTIFIER: com.arte1.macrowavers
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
     scheme:
       testTargets:
-        - SkyAndPlanetsTests
+        - MacrowaversTests
       gatherCoverageData: true
 
-  SkyAndPlanetsTests:
+  MacrowaversTests:
     type: bundle.unit-test
     platform: visionOS
     sources:
-      - path: Tests/SkyAndPlanetsTests
+      - path: Tests/MacrowaversTests
     dependencies:
-      - target: SkyAndPlanets
+      - target: Macrowavers
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.arte1.skyandplanets.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.arte1.macrowavers.tests
         GENERATE_INFOPLIST_FILE: YES

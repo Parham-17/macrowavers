@@ -17,7 +17,7 @@ if gh repo view "$full" >/dev/null 2>&1; then
   echo "Already exists, reusing."
 else
   gh repo create "$full" "--$visibility" \
-    --description "Sky and the Planets: a native visionOS game built in 40 days (Arte-1 challenge)" \
+    --description "Macrowavers: a native visionOS game on the theme Sky and the Planets, built in 40 days (Arte-1 challenge)" \
     --disable-wiki --disable-issues
 fi
 git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$full.git"

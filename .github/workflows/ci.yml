@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 env:
-  PROJECT: SkyAndPlanets
-  SCHEME: SkyAndPlanets
+  PROJECT: Macrowavers
+  SCHEME: Macrowavers
   DESTINATION: platform=visionOS Simulator,name=Apple Vision Pro,OS=latest
 
 jobs:
