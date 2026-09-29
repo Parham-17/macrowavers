@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Enforces Conventional Commits on the subject line. Installed by scripts/bootstrap.sh.
+subject="$(head -n1 "$1")"
+case "$subject" in
+  Merge*|Revert*|fixup!*|squash!*|"") exit 0 ;;
+esac
+pattern='^(feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)(\([a-z0-9._/-]+\))?!?: [^ ].{0,71}$'
+if ! [[ "$subject" =~ $pattern ]]; then
+  cat >&2 <<MSG
+✗ Commit subject does not follow Conventional Commits:
+    $subject
+  Expected:  type(scope): summary           e.g.  feat(orbit): snap moons to a stable orbit
+  Types:     feat fix chore docs refactor perf test build ci style revert
+  Keep the summary under 72 characters. Details: CONTRIBUTING.md
+MSG
+  exit 1
+fi

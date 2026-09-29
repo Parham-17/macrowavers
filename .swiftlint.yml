@@ -1,0 +1,54 @@
+# SwiftLint: kept small on purpose. Add rules when the team agrees on them.
+included:
+  - Sources
+  - Tests
+excluded:
+  - DerivedData
+  - .build
+  - RealityComposerPro
+  - Assets
+
+disabled_rules:
+  - todo                     # TODOs are fine; Jira holds the real backlog
+  - trailing_comma
+  - opening_brace            # Xcode's formatter disagrees with this one
+
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+  - contains_over_first_not_nil
+  - first_where
+  - last_where
+  - sorted_first_last
+  - unused_optional_binding
+  - vertical_whitespace_closing_braces
+  - explicit_init
+  - redundant_type_annotation
+  - toggle_bool
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+
+identifier_name:
+  min_length: 2
+  excluded: [x, y, z, w, i, j, k, dt, id, up]   # 3D math and RealityKit vocabulary
+
+type_body_length:
+  warning: 300
+  error: 500
+
+file_length:
+  warning: 500
+  error: 800
+
+function_body_length:
+  warning: 60
+  error: 100
+
+nesting:
+  type_level: 2
+
+reporter: xcode

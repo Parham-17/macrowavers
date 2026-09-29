@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main, "release/**", "hotfix/**"]
+  push:
+    branches: [develop, main]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: SkyAndPlanets
+  SCHEME: SkyAndPlanets
+  DESTINATION: platform=visionOS Simulator,name=Apple Vision Pro,OS=latest
+
+jobs:
+  pr-title:
+    name: PR title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Title follows Conventional Commits (it becomes the squash commit)
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)(\([a-z0-9._/-]+\))?!?: .+'
+          if [[ "$TITLE" =~ $pattern ]]; then
+            echo "ok: $TITLE"
+          else
+            echo "::error::PR title must look like 'type(scope): summary', e.g. 'feat(orbit): snap moons to a stable orbit'"
+            exit 1
+          fi
+
+  branch-name:
+    name: Branch name
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Head branch follows the GitFlow naming rules
+        env:
+          HEAD: ${{ github.head_ref }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          ok='^(feature|spike)/AR126-[0-9]+-[a-z0-9-]+$|^(release|hotfix)/[0-9]+\.[0-9]+\.[0-9]+$|^(main|develop)$'
+          if ! [[ "$HEAD" =~ $ok ]]; then
+            echo "::error::Branch '$HEAD' must be feature/AR126-<n>-<slug>, spike/AR126-<n>-<slug>, release/<x.y.z> or hotfix/<x.y.z>"
+            exit 1
+          fi
+          if [[ "$HEAD" == spike/* ]]; then
+            echo "::error::Spikes are throwaway. To keep the work, rename the branch: git branch -m feature/${HEAD#spike/}"
+            exit 1
+          fi
+          if [[ "$BASE" == main && ! "$HEAD" =~ ^(release|hotfix)/ ]]; then
+            echo "::error::Only release/* and hotfix/* branches merge into main"
+            exit 1
+          fi
+          echo "ok: $HEAD -> $BASE"
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    container: ghcr.io/realm/swiftlint:0.65.1
+    steps:
+      - uses: actions/checkout@v5
+      - name: SwiftLint (strict)
+        run: swiftlint lint --strict --reporter github-actions-logging
+
+  build-test:
+    name: Build and test
+    # GitHub's hosted macOS image ships Xcode 26.x (checked 2026-09-29), which cannot build a visionOS 27
+    # project. The team's self-hosted runner has Xcode 27. Switch with the repository variable
+    # CI_MACOS_RUNNER=self-hosted (see docs/ci.md). Unset it to return to hosted runners later.
+    runs-on: ${{ vars.CI_MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          lfs: false
+
+      # LFS bandwidth is metered: cache the objects and only pull what changed.
+      - name: List LFS objects
+        run: git lfs ls-files --long | cut -d ' ' -f1 | sort > .lfs-objects
+      - name: Restore LFS cache
+        uses: actions/cache@v4
+        with:
+          path: .git/lfs/objects
+          key: lfs-${{ hashFiles('.lfs-objects') }}
+          restore-keys: lfs-
+      - name: Pull LFS objects
+        run: git lfs pull
+
+      - name: Select Xcode 27
+        run: |
+          xc="$(ls -d /Applications/Xcode_27*.app /Applications/Xcode.app 2>/dev/null | sort -V | tail -n 1)"
+          [ -n "$xc" ] || { echo "::error::No Xcode found on this runner"; exit 1; }
+          echo "DEVELOPER_DIR=$xc/Contents/Developer" >> "$GITHUB_ENV"
+          echo "Using $xc"
+          "$xc/Contents/Developer/usr/bin/xcodebuild" -version
+          "$xc/Contents/Developer/usr/bin/xcodebuild" -showsdks | grep -i xros || echo "::warning::No visionOS SDK listed"
+
+      - name: Install XcodeGen
+        run: command -v xcodegen >/dev/null || brew install xcodegen
+
+      - name: Generate project
+        run: |
+          cp -n Configs/Local.xcconfig.example Configs/Local.xcconfig || true
+          xcodegen generate
+
+      - name: Build and test (visionOS simulator)
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT.xcodeproj" \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            -quiet
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: TestResults.xcresult
+          retention-days: 7

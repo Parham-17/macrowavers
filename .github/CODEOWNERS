@@ -1,0 +1,15 @@
+# Code owners get review requests automatically for the paths they own.
+# Fill in GitHub handles once everyone has joined, then (optionally) turn on
+# "require code owner review" in the develop ruleset.
+#
+# Everything: the three developers
+# *                        @dev-pk @dev-co @dev-kp
+#
+# Scenes and art: the two designers
+# /RealityComposerPro/     @design-am @design-ib
+# /Assets/                 @design-am @design-ib
+#
+# Project plumbing: whoever maintains the toolchain
+# /project.yml             @dev-pk
+# /.github/                @dev-pk
+# /scripts/                @dev-pk

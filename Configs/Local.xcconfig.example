@@ -1,0 +1,4 @@
+// Per-developer build settings. `make bootstrap` copies this to Configs/Local.xcconfig (gitignored).
+// Put your Apple Team ID here so device builds sign automatically. Find it at
+// https://developer.apple.com/account -> Membership details, or in Xcode -> Settings -> Accounts.
+DEVELOPMENT_TEAM =
