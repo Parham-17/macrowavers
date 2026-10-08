@@ -10,6 +10,5 @@
 # /Assets/                 @design-am @design-ib
 #
 # Project plumbing: whoever maintains the toolchain
-# /project.yml             @dev-pk
+# /Macrowavers.xcodeproj/  @dev-pk
 # /.github/                @dev-pk
-# /scripts/                @dev-pk

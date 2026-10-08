@@ -18,7 +18,7 @@ that is never merged. Branch names carry the Jira key. Conventional Commits, enf
 
 - `main` always holds the last demo build; `develop` is what the next demo will be. Release branches let fixes
   land for the review while features keep flowing.
-- Two long-lived branches cost a back-merge per sprint. The Makefile and CONTRIBUTING.md make it a checklist.
+- Two long-lived branches cost a back-merge per sprint. CONTRIBUTING.md makes it a checklist.
 - Trunk-based development would be lighter. We chose GitFlow because sprint reviews are fixed dates with real
   builds, and the release branch gives the team a calm day before each one. If the process gets in the way, the
   fallback is dropping release branches and tagging `develop` directly.

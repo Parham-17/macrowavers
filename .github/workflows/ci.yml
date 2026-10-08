@@ -103,13 +103,8 @@ jobs:
           "$xc/Contents/Developer/usr/bin/xcodebuild" -version
           "$xc/Contents/Developer/usr/bin/xcodebuild" -showsdks | grep -i xros || echo "::warning::No visionOS SDK listed"
 
-      - name: Install XcodeGen
-        run: command -v xcodegen >/dev/null || brew install xcodegen
-
-      - name: Generate project
-        run: |
-          cp -n Configs/Local.xcconfig.example Configs/Local.xcconfig || true
-          xcodegen generate
+      - name: Local build settings
+        run: cp -n Configs/Local.xcconfig.example Configs/Local.xcconfig || true
 
       - name: Build and test (visionOS simulator)
         run: |

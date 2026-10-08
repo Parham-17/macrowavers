@@ -1,7 +1,6 @@
-# --- Generated Xcode project (we commit project.yml, not the .xcodeproj) ---
-*.xcodeproj
-*.xcworkspace
-!*.xcworkspace/contents.xcworkspacedata
+# --- Xcode project ---
+# Macrowavers.xcodeproj is committed and uses synced folders (docs/decisions/0004). Only per-user state stays out
+# (xcuserdata/ and *.xcuserstate below).
 
 # --- Xcode / Swift build output ---
 build/

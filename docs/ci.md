@@ -8,7 +8,7 @@
 | PR title | ubuntu | Conventional Commits format |
 | Branch name | ubuntu | GitFlow naming, spikes cannot merge, only release/hotfix into main |
 | Lint | ubuntu (SwiftLint container) | `swiftlint lint --strict` |
-| Build and test | macOS | XcodeGen, `xcodebuild test` on the visionOS simulator |
+| Build and test | macOS | `xcodebuild test` on the visionOS simulator (the `.xcodeproj` is committed) |
 
 `.github/workflows/release.yml` turns a `vX.Y.Z` tag into a GitHub Release with that version's CHANGELOG section.
 
@@ -25,7 +25,7 @@ so about 200 macOS minutes, roughly 20 to 40 builds. Public repositories get unl
 ## Self-hosted runner setup (about 10 minutes, one Mac)
 
 Pick a Mac that stays on and plugged in during work hours. Xcode 27, the visionOS 27 simulator runtime and Homebrew
-must be installed. `xcodegen` and `git-lfs` should be installed too (`brew install xcodegen git-lfs`).
+must be installed. `git-lfs` should be installed too (`brew install git-lfs`).
 
 1. GitHub: repository **Settings → Actions → Runners → New self-hosted runner**, choose macOS / ARM64.
 2. Run the shown commands in a terminal: download, `./config.sh --url ... --token ...` (accept the default labels
@@ -35,7 +35,7 @@ must be installed. `xcodegen` and `git-lfs` should be installed too (`brew insta
    ```
 3. Keep the Mac awake: System Settings → Energy → prevent sleeping when the display is off, or run
    `caffeinate -s` in a terminal during work hours.
-4. CI already points at it: `scripts/github-setup.sh` sets the repository variable `CI_MACOS_RUNNER=self-hosted`.
+4. Point CI at it with the repository variable: `gh variable set CI_MACOS_RUNNER --body self-hosted`.
    Until a runner is registered, the **Build and test** job waits in the queue, and PRs cannot merge.
 5. Open a test PR and watch **Build and test** run on the machine.
 

@@ -11,8 +11,8 @@
 # =========================
 # Git LFS: binary assets
 # =========================
-# Anything below is stored in LFS, not in the Git history. Run `make bootstrap`
-# once so `git lfs` is installed and the filters are active on your machine.
+# Anything below is stored in LFS, not in the Git history. Run `git lfs install`
+# once (see the Quick start in README.md) so the filters are active on your machine.
 
 # 3D scenes and models
 *.usd   filter=lfs diff=lfs merge=lfs -text
