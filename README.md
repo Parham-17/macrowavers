@@ -1,9 +1,32 @@
 # Macrowavers
 
-A native visionOS game for Apple Vision Pro on the theme "Sky and the Planets", built in 40 days by a team of five
+A native visionOS game for Apple Vision Pro inspired by a Persian fairy tale, built in 40 days by a team of five
 for the Arte-1 challenge.
 
 Stack: Swift 6, SwiftUI, RealityKit, Reality Composer Pro 3. Target: visionOS 27.
+
+## Features
+
+### Untangle the Dragon
+
+Branch `feature/AR126-100-untangle-dragon` · Jira AR126-100 · full docs in
+[docs/features/untangle-dragon/README.md](docs/features/untangle-dragon/README.md)
+
+A mixed-reality puzzle. The dragon of the tale lies on a floating platform in front of the player, its long body
+tied in a knot. The player has to set it free:
+
+- **Untangle it with your hands.** Pinch and drag any part of the body, even two parts at once (one per hand), and
+  lift them to pass them over or under the rest. The part you look at glows; red pulsing spheres mark every
+  crossing and the panel counts how many are left.
+- **The dragon fights back.** If you stop making progress it warns you (it stares at you, growls, smoke rises
+  from its nostrils), then it has a fit: it turns around, rears up and roars with a burst of fire, lashes its tail
+  and coils. Every fit adds at least one new crossing, and fits come sooner each time.
+- **Set it free.** At zero crossings the dragon turns gold, celebrates, then takes off and flies around the room
+  on its own: it circles you, dives past you, hovers in front of you roaring and loops in the air.
+- **Comfortable seated or standing.** The platform can be moved, raised, rotated and tilted.
+
+Open it from the main window with **Untangle the Dragon**. It uses a placeholder dragon built in code until the
+design team's asset (`DragonBody` / `DragonHead`) is added; the asset specification is in the feature docs.
 
 ## Requirements
 
