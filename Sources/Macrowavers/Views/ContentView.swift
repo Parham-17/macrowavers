@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppModel.self) private var appModel
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(spacing: 24) {
@@ -11,6 +12,9 @@ struct ContentView: View {
                 .font(.title2)
                 .foregroundStyle(.secondary)
             Button(buttonTitle, action: primaryAction)
+            Button("Untangle the Dragon", systemImage: "lizard") {
+                openWindow(id: ControlPanelView.windowID)
+            }
         }
         .padding(48)
     }
