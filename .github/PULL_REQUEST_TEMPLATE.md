@@ -20,7 +20,7 @@ Jira: AR126-
 
 - [ ] Ran on the simulator
 - [ ] Ran on a Vision Pro (required for hands, world sensing, immersion and comfort changes)
-- [ ] `make lint` and `make test` pass locally
-- [ ] Targets or files changed in `project.yml`, no `.xcodeproj` committed
+- [ ] `swiftlint lint --strict` and the unit tests (Cmd-U) pass locally
+- [ ] Project changes (targets, settings, capabilities) are intended; no `xcuserdata` committed
 - [ ] New binary assets show up in `git lfs ls-files`
 - [ ] RCP scene edits: I was the scene's owner and said so in the ticket

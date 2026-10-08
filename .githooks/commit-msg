@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Enforces Conventional Commits on the subject line. Installed by scripts/bootstrap.sh.
+# Enforces Conventional Commits on the subject line. Enable once per clone: git config core.hooksPath .githooks
 subject="$(head -n1 "$1")"
 case "$subject" in
   Merge*|Revert*|fixup!*|squash!*|"") exit 0 ;;

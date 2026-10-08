@@ -16,7 +16,7 @@ blocks non-LFS files above 5 MB. RCP scenes have a single owner at a time becaus
 ## Consequences
 
 - Clones stay small; history stays fast.
-- Every machine, including CI, needs `git lfs install` (done by bootstrap). CI caches LFS objects to save
+- Every machine, including CI, needs `git lfs install` (see the Quick start in README.md). CI caches LFS objects to save
   bandwidth.
 - LFS quota on GitHub Free is 10 GiB storage and 10 GiB bandwidth per month per account, metered beyond that
   (checked 2026-09-29). Keep files small and re-export sparingly.
