@@ -24,6 +24,10 @@ final class SkeletalDragonRig: DragonRig {
         static let rightWingJoint = "wing_R"
         /// Asse locale attorno a cui ruota l'osso dell'ala per spiegarsi.
         static let wingFlareAxis = SIMD3<Float>(0, 0, 1)
+        /// Tratto di collo (m) che esce dalla nuca nella direzione della testa prima di raggiungere il corpo simulato.
+        static let neckBlendLength: Float = 0.18
+        /// Punti della curva tra due nodi simulati: la spina ha più ossa dei nodi, senza questi seguirebbe gli spigoli.
+        static let curveSubdivisions = 4
     }
 
     /// Nomi delle animazioni attese nell'asset: prima quella del movimento in corso, poi quella dello stato d'animo.
@@ -125,7 +129,10 @@ final class SkeletalDragonRig: DragonRig {
 
         entity.name = "SkeletalDragon"
         entity.addChild(bodyRoot)
-        let anchor = head ?? Entity()
+        // La testa sta dentro un contenitore: il codice muove il contenitore e non sovrascrive la
+        // trasformazione della radice dell'asset (es. la rotazione Z-up → Y-up aggiunta dall'export di Blender).
+        let anchor = Entity()
+        if let head { anchor.addChild(head) }
         headAnchor = anchor
         entity.addChild(anchor)
         let nostrils = anchor.findEntity(named: "nostrils") ?? Self.marker(in: anchor, at: SIMD3(0, 0.01, 0.08))
@@ -145,15 +152,16 @@ final class SkeletalDragonRig: DragonRig {
 
     func update(_ frame: DragonFrame, deltaTime: Float) {
         animator.update(frame, deltaTime: deltaTime)
-        let visual = animator.visualPositions(frame)
+        let head = animator.pose.headOrientation
+        let visual = Self.neckFollowingHead(animator.visualPositions(frame), headOrientation: head)
 
         headAnchor.position = visual[0]
-        headAnchor.orientation = animator.pose.headOrientation
+        headAnchor.orientation = head
         playClip(named: Self.clipName(for: frame.mood, action: frame.action), loops: frame.action == nil)
         effects.update(pose: animator.pose, frame: frame)
 
         var transforms = model.jointTransforms
-        poseSpine(along: visual.map { model.convert(position: $0, from: entity) }, transforms: &transforms)
+        poseSpine(along: Self.smoothed(visual).map { model.convert(position: $0, from: entity) }, transforms: &transforms)
         poseWings(&transforms)
         model.jointTransforms = transforms
     }
@@ -195,6 +203,52 @@ final class SkeletalDragonRig: DragonRig {
             transforms[jointIndex] = local
             previousOrientation = orientation
         }
+    }
+
+    /// La testa è un pezzo rigido: se si gira rispetto al collo si vede il taglio. Il primo tratto di collo esce
+    /// quindi dalla nuca nella direzione opposta al muso e si raccorda gradualmente al corpo simulato.
+    /// Se la testa guarda in alto si solleva un po', così il collo non scende sotto la piattaforma.
+    private static func neckFollowingHead(_ points: [SIMD3<Float>], headOrientation: simd_quatf) -> [SIMD3<Float>] {
+        guard points.count > 1 else { return points }
+        let blendLength = Asset.neckBlendLength
+        let back = headOrientation.act(SIMD3(0, 0, -1))
+        let start = points[0] + SIMD3(0, 0.5 * blendLength * max(0, -back.y), 0)
+        var result = points
+        result[0] = start
+        var travelled: Float = 0
+        for index in points.indices.dropFirst() {
+            travelled += simd_length(points[index] - points[index - 1])
+            guard travelled < blendLength else { break }
+            let progress = travelled / blendLength
+            let weight = progress * progress * (3 - 2 * progress)
+            result[index] = simd_mix(start + back * travelled, points[index], SIMD3(repeating: weight))
+        }
+        return result
+    }
+
+    /// Spline di Catmull-Rom che passa per i nodi: curve morbide invece della polilinea.
+    private static func smoothed(_ points: [SIMD3<Float>]) -> [SIMD3<Float>] {
+        guard points.count > 2 else { return points }
+        let steps = Asset.curveSubdivisions
+        var result: [SIMD3<Float>] = []
+        result.reserveCapacity((points.count - 1) * steps + 1)
+        for index in 0..<(points.count - 1) {
+            let p0 = points[max(index - 1, 0)]
+            let p1 = points[index]
+            let p2 = points[index + 1]
+            let p3 = points[min(index + 2, points.count - 1)]
+            // Coefficienti del polinomio cubico del tratto p1 → p2.
+            let c0 = 2 * p1
+            let c1 = p2 - p0
+            let c2 = 2 * p0 - 5 * p1 + 4 * p2 - p3
+            let c3 = 3 * p1 - p0 - 3 * p2 + p3
+            for step in 0..<steps {
+                let along = Float(step) / Float(steps)
+                result.append(0.5 * (c0 + c1 * along + c2 * (along * along) + c3 * (along * along * along)))
+            }
+        }
+        result.append(points[points.count - 1])
+        return result
     }
 
     // MARK: - Animazioni

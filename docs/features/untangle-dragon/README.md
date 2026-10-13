@@ -4,13 +4,13 @@ A mixed-reality mini-game: a dragon lies on a floating platform in front of the 
 in a knot. The player grabs the body with their hands and untangles it. Once free, the dragon takes off and
 flies around the room.
 
-Branch: `feature/AR126-100-untangle-dragon`. Status: playable with a code-generated placeholder dragon,
-waiting for the design team's asset.
+Branch: `feature/AR126-100-untangle-dragon`. Status: playable with a temporary Sketchfab dragon (see
+[Temporary asset](#temporary-asset)); the code-generated placeholder is used when the asset is not in the bundle.
 
 ## How to try it
 
-1. Generate the project as usual (`make generate` or `xcodegen generate`) and run on the visionOS simulator
-   or on a Vision Pro.
+1. Open `Macrowavers.xcodeproj` and run on the visionOS simulator or on a Vision Pro. Run `git lfs pull`
+   first if the `.usdz` files under `Sources/Macrowavers/Resources/` are only LFS pointers.
 2. In the main window tap **Untangle the Dragon**: a control panel opens.
 3. Tap **Start**: an `ImmersiveSpace` in `.mixed` style opens, with the platform and the dragon in front of you.
 4. Pinch and drag the dragon's body (one part per hand), lift parts to pass them over or under the others.
@@ -53,6 +53,8 @@ Sources/Macrowavers/
         ├── ViewerTracker.swift           Player head position (ARKit world tracking, no permission needed)
         ├── ProceduralDragonRig.swift     Placeholder dragon built from primitives
         └── SkeletalDragonRig.swift       Rig for the real asset, picked automatically when it is in the bundle
+Sources/Macrowavers/Resources/DragonBody.usdz, DragonHead.usdz   Temporary dragon asset (Git LFS)
+Assets/Blender/untangle-dragon/       Blender scripts that generate the temporary asset (not in the app)
 Tests/MacrowaversTests/UntangleTests.swift
 ```
 
@@ -125,8 +127,33 @@ Grab start/end comes from `ManipulationEvents.WillBegin/WillRelease/WillEnd`, su
 **General**: PBR materials (they pick up the real room light), moderate polygon count (passthrough is on).
 Per-part hover on a single skinned mesh needs a ShaderGraph material using the hover input.
 
-`SkeletalDragonRig` compiles but has never run against a real asset: validate with a first test export
-(even a tube with 20 bones).
+On the code side the spine follows a Catmull-Rom spline through the simulated nodes (not the polyline, which
+showed corners), and the first stretch of neck (`SkeletalDragonRig.Asset.neckBlendLength`) leaves the back of
+the head in the head's direction, so the rigid head and the neck do not show a seam when the head turns (when
+it looks up the neck is lifted a little so it does not sink under the platform). The head sits inside a
+container entity: the code moves the container and never overwrites the transform of the asset's root.
+
+### Temporary asset
+
+Until the design team's dragon is ready, `Sources/Macrowavers/Resources/DragonBody.usdz` and `DragonHead.usdz`
+come from **"Chinese dragon" by MAXDESIGN-3D on Sketchfab, licensed CC BY 4.0: it must be credited in the
+app credits.** Remove both files to go back to the placeholder dragon.
+
+They are generated without opening Blender by the scripts in `Assets/Blender/untangle-dragon/`:
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup \
+    -P Assets/Blender/untangle-dragon/crea_asset_drago.py -- <scene.gltf> <output folder>
+```
+
+The script removes the legs and closes the holes with curved patches (the hole border is unrolled on the
+body cylinder, triangulated in 2D and wrapped back, so no flat patches), detaches the head, slims the body,
+builds a 64-bone spine with smooth weights (skin that bends instead of kinking), adds `nostrils`/`mouth`,
+fixes the material and exports (USDZ validated with `usdchecker`).
+
+Notes: use the glTF download (Sketchfab's USDZ loses the texture and the bone names); the model's "emissive"
+texture is not its colour (the body uses a solid red); Blender's export with *Convert Orientation* puts a
+rotation on the file's root, which is why the head is wrapped in a container.
 
 ## Tuning
 
