@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 1) Large binaries must be in LFS. 2) Never commit the generated .xcodeproj. 3) SwiftLint staged Swift files.
+# 1) Large binaries must be in LFS. 2) Never commit per-user Xcode state. 3) SwiftLint staged Swift files.
 set -uo pipefail
 fail=0
 limit=$((5 * 1024 * 1024))
@@ -16,8 +16,8 @@ while IFS= read -r -d '' f; do
   fi
 done < <(git diff --cached --name-only --diff-filter=AM -z)
 
-if git diff --cached --name-only | grep -qE '\.xcodeproj/'; then
-  echo "✗ The .xcodeproj is generated from project.yml; do not commit it. Run: git restore --staged '*.xcodeproj'" >&2
+if git diff --cached --name-only | grep -qE '(xcuserdata/|\.xcuserstate$)'; then
+  echo "✗ Per-user Xcode state is staged. Run: git restore --staged '*xcuserdata*' '*.xcuserstate'" >&2
   fail=1
 fi
 
@@ -25,10 +25,10 @@ if command -v swiftlint >/dev/null 2>&1; then
   swift_files=$(git diff --cached --name-only --diff-filter=AM | grep '\.swift$' || true)
   if [ -n "$swift_files" ]; then
     # shellcheck disable=SC2086
-    swiftlint lint --strict --quiet $swift_files || { echo "✗ SwiftLint failed. Try: make lint-fix" >&2; fail=1; }
+    swiftlint lint --strict --quiet $swift_files || { echo "✗ SwiftLint failed. Try: swiftlint --fix" >&2; fail=1; }
   fi
 else
-  echo "! swiftlint not installed; skipping lint (run make bootstrap)" >&2
+  echo "! swiftlint not installed; skipping lint (run brew bundle)" >&2
 fi
 
 exit $fail

@@ -1,6 +1,6 @@
 # 2. The Xcode project is generated with XcodeGen
 
-Date: 2026-09-29. Status: accepted.
+Date: 2026-09-29. Status: superseded by [0004](0004-committed-xcode-project-with-synced-folders.md).
 
 ## Context
 
